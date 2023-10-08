@@ -14,7 +14,11 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev")); 
 }
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://artvisionary-nft-marketplace.vercel.app",
+  })
+);
 app.use(express.static(`${__dirname}/public`));
 
 app.use("/api/v1/users", userRouter); 
