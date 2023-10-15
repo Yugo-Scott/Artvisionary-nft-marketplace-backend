@@ -9,7 +9,7 @@ router.post(
   "/register",
   userController.uploadUserPhoto,
   userController.resizeUserPhoto,
-  userController.register
+  userController.signup
 );
 
 router.route("/likes").get(authController.protect, userController.getOneUser);

@@ -5,7 +5,7 @@ const authController = require("../controllers/authController");
 const router = express.Router();
 
 router.route("/").get(authController.protect, nftController.getAllNfts);
-router.route("/").post(nftController.createNft);
+router.route("/").post(authController.protect, nftController.createNft);
 
 router
   .route("/updateLike")

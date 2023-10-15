@@ -11,14 +11,6 @@ const userSchema = new mongoose.Schema(
       unique: true,
       required: [true, "Please tell us your user_id!"],
     },
-    user_type: {
-      type: String,
-      required: [true, "Please tell us your user_type!"],
-      enum: {
-        values: ["artist", "member"],
-        message: "user_type is either: artist or member",
-      },
-    },
     profile_image: {
       type: String,
       default: "default.jpg",

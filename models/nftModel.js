@@ -40,7 +40,7 @@ const nftSchema = new mongoose.Schema({
     enum: ["square", "horizontal", "vertical"],
     default: "square",
   },
-  tages: {
+  tags: {
     type: Array,
   },
   likes: [

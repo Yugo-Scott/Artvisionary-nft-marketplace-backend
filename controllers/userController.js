@@ -4,7 +4,6 @@ const catchAsync = require("../utils/catchAsync");
 const multer = require("multer");
 const sharp = require("sharp");
 const AppError = require("../utils/appError");
-const createOneUser = factory.createOne(User);
 
 const multerStorage = multer.memoryStorage(); // when you image processing before saving to disk, you should use memoryStorage() instead of diskStorage() because you can access to the image as buffer in memoryStorage() but you can't in diskStorage() file name is not get set in memoryStorage() so you should set file name in resizeUserPhoto middleware
 
@@ -22,7 +21,7 @@ const upload = multer({
   fileFilter: multerFilter,
 });
 
-exports.uploadUserPhoto = upload.single("profile_image"); // 画像をアップロードするときは、upload.single('photo')を追加する'photo'はフロント側で指定した名前 これでreq.fileに画像の情報が入る
+exports.uploadUserPhoto = upload.single("profile_image"); // 画像をアップロードするときは、upload.single('profile_image')を追加する'profile_image'はフロント側で指定した名前 これでreq.fileに画像の情報が入る
 
 exports.resizeUserPhoto = (req, res, next) => {
   if (!req.file) return next(); // 画像がない場合は次のミドルウェアに移動する
@@ -32,9 +31,7 @@ exports.resizeUserPhoto = (req, res, next) => {
     .resize(500, 500)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    .toFile(
-      `/Users/satoyugo/Desktop/Artvisionary-nft-marketplace/public/images/users/${req.file.filename}`
-    );  //toFile()はファイルを保存する この時、req.file.bufferは画像のデータを含んでいる 画像のデータをリサイズして、jpeg形式に変換して、qualityを90%にして、ファイルを保存する
+    .toFile(`${__dirname}/../public/img/users/${req.file.filename}`);  //toFile()はファイルを保存する この時、req.file.bufferは画像のデータを含んでいる 画像のデータをリサイズして、jpeg形式に変換して、qualityを90%にして、ファイルを保存する
   next();
 };
 
@@ -46,15 +43,41 @@ const filterObj = (obj, ...allowedFields) => {
   return newObj;
 };
 
-exports.register = catchAsync(async (req, res, next) => {
+exports.signup = catchAsync(async (req, res, next) => {
+  let user_id
+  if (req.body.user_id) {
+    user_id = req.body.user_id
+  } else {
+    return next(new AppError( "please sign up with metamask", 400))
+  }
+  // compare user_id with database user_id and if it is not in database, create new user
+  const user = await User.findOne({ user_id: user_id }); 
 
+  if (user) {
+    return next(new AppError( "you already have an account", 400))
+  } else {
   const filteredBody = filterObj(req.body);
   if (req.file && req.file.filename) filteredBody.profile_image = req.file.filename;
  
   req.body = { ...req.body, ...filteredBody };
+  const newUser = await User.create({
+    user_id,
+    name: req.body.name,
+    bio: req.body.bio,
+    content: req.body.content,
+    profile_image: req.body.profile_image,
+  });
+  res.status(201).json({
+    status: "success",
+    data: {
+      user: newUser,
+    },
+  });
+}
+}
+);
 
-  await createOneUser(req, res, next);
-});
+
 
 // get one user with nfts where the user_id is in likes array use handlerFactory.getOne() with popOptions
 exports.getOneUser = factory.getOne(User, { path: "likes" });
