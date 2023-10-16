@@ -4,8 +4,8 @@ const APIFeatures = require("../utils/apiFeatures");
 
 exports.createOne = (Model) =>
   catchAsync(async (req, res, next) => {
-    // use protect middleware to get _id
-    const userId = req.user._id;  
+    // use protect middleware to get user_id
+    const userId = req.user.user_id;
     console.log(userId);
     // add owner and seller to req.body
     req.body.owner = "0xcd60f93430a45ce43f9f21c247ee906bb36ba1c0";
