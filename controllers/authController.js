@@ -25,6 +25,27 @@ const signToken = (nonce, address) => {
   });
 }
 
+exports.checkUser = catchAsync(async (req, res, next) => {
+  const { address } = req.body;
+  // find user by address(user_id) and return boolean
+  const user = await User.findOne({ user_id: address }); // user_id = address
+  if (!user) {
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        userExists: false,
+      },
+    });
+  } else {
+    return res.status(200).json({
+      status: 'success',
+      data: {
+        userExists: true,
+      },
+    });
+  }
+});
+
 // nonce for authentication
 exports.getNonce = catchAsync(async (req, res, next) => {
   const { address } = req.body;
