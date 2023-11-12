@@ -80,7 +80,35 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 
 // get one user with nfts where the user_id is in likes array use handlerFactory.getOne() with popOptions
-exports.getOneUser = factory.getOne(User, { path: "likes" });
+exports.getOneUser = factory.getOne(User, {
+  path: 'likes',
+});
 exports.getUser = factory.getOne(User);
 
+exports.getOneUserBySeller = catchAsync(async (req, res, next) => {
+      const userId = req.user._id;
+      console.log(userId);
+
+      let query = User.findById(userId); 
+      query = query.populate(
+        'likes',
+      );   
+      const doc = await query;
+
+  const sellers = await Promise.all(
+    doc.likes.map(async (like) => {
+      const seller = await User.findOne({ user_id: like.seller });
+      return seller;
+    })
+  );
+  console.log(sellers);
+  res.status(200).json({
+    status: "success",
+    data: {
+      data: doc,
+      sellers,
+    },
+  });
+}
+);
 

@@ -12,7 +12,9 @@ router.post(
   userController.signup
 );
 
-router.route("/likes").get(authController.protect, userController.getOneUser);
+router
+  .route('/likes')
+  .get(authController.protect, userController.getOneUserBySeller);
 router.route("/:id/profile").get(userController.getUser);
 
 module.exports = router;
